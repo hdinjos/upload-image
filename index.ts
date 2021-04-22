@@ -16,7 +16,9 @@ const db = new Loki(`${UPLOAD_PATH}/${DB_NAME}`, {persistenceMethod: 'fs'});
 
 
 const app = express();
+app.use(cors());
 
+//single
 app.post('/profile', upload.single('avatar'), async (req, res) => {
   try {
     const col = await loadCollection(COLLECTION_NAME, db);
@@ -29,8 +31,18 @@ app.post('/profile', upload.single('avatar'), async (req, res) => {
   }
 });
 
+//multiple
+app.post('/photos/upload', upload.array('photos', 12), async (req, res) => {
+  try {
+    const col = await loadCollection(COLLECTION_NAME, db);  
+    let data = [].concat(col.insert(req.files));
+    db.saveDatabase();
+    res.send(data.map(x => ({id: x.$loki, filename: x.filename, originalName: x.originalname})));
+  }catch(err){
+    res.send(400);
+  }
+});
 
-app.use(cors());
 app.listen(3000, ()=> {
   console.log('listening on port 3000');
-})
+});
