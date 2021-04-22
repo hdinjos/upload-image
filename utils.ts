@@ -17,4 +17,8 @@ const imageFilter = (req, file, cb) => {
   cb(null, true);
 }
 
-export {loadCollection, imageFilter};
+const cleanFolder = (folderPath) => {
+  del.sync([`${folderPath}/**`, `!${folderPath}`]);
+};
+
+export {loadCollection, imageFilter, cleanFolder};

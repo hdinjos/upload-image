@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as Loki from 'lokijs';
 
-import {loadCollection, imageFilter} from './utils';
+import {loadCollection, imageFilter, cleanFolder} from './utils';
 
 
 const DB_NAME = 'db.json';
@@ -69,6 +69,8 @@ app.get('/images/:id', async(req, res) => {
     res.sendStatus(400);
   }
 });
+
+// cleanFolder(UPLOAD_PATH);
 
 app.listen(3000, ()=> {
   console.log('listening on port 3000');
