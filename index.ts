@@ -5,13 +5,13 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as Loki from 'lokijs';
 
-import {loadCollection} from './utils';
+import {loadCollection, imageFilter} from './utils';
 
 
 const DB_NAME = 'db.json';
 const COLLECTION_NAME = 'images';
 const UPLOAD_PATH = 'uploads';
-const upload = multer({dest: `${UPLOAD_PATH}/`});
+const upload = multer({dest: `${UPLOAD_PATH}/`, fileFilter: imageFilter});
 const db = new Loki(`${UPLOAD_PATH}/${DB_NAME}`, {persistenceMethod: 'fs'});
 
 
@@ -27,7 +27,8 @@ app.post('/profile', upload.single('avatar'), async (req, res) => {
   }catch (err){
     res.sendStatus(404);
   }
-})
+});
+
 
 app.use(cors());
 app.listen(3000, ()=> {
