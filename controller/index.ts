@@ -5,24 +5,29 @@ import fs from 'fs';
 import path from 'path';
 import Loki from 'lokijs';
 import express from 'express';
+import db from '../database';
 
 const router = express.Router();
 
 
-const DB_NAME = 'db.json';
+const DB_NAME = 'db.json';  
 const COLLECTION_NAME = 'images';
 const UPLOAD_PATH = 'uploads';
 const upload = multer({dest: `${UPLOAD_PATH}/`, fileFilter: imageFilter});
-const db = new Loki(`${UPLOAD_PATH}/${DB_NAME}`, {persistenceMethod: 'fs'});
+// const db = new Loki(`${UPLOAD_PATH}/${DB_NAME}`, {persistenceMethod: 'fs'});
 
 //single
 router.post('/profile', upload.single('avatar'), async (req, res) => {
   try {
-    const col = await loadCollection(COLLECTION_NAME, db);
-    const data = col.insert(req.file);
+    console.log(req.file);
+    const queryPost = 'INSERT INTO image_files(filename, filepath, mimetype, size) VALUES($1,$2,$3,$4)';
+    const valuePost = [`${req.file.filename}`, `${req.file.path}`, `${req.file.mimetype}`, `${req.file.size}`]
+    await db.query(queryPost, valuePost);
+    // const col = await loadCollection(COLLECTION_NAME, db);
+    // const data = col.insert(req.file);
 
-    db.saveDatabase();
-    res.send({id: data.$loki, filename: data.filename, originalName: data.originalname});
+    // db.saveDatabase();
+    res.send({msg: 'add image successfull'});
   }catch (err){
     res.sendStatus(404);
   }
