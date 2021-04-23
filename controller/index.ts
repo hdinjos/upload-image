@@ -20,15 +20,20 @@ const upload = multer({dest: `${UPLOAD_PATH}/`, fileFilter: imageFilter});
 router.post('/profile', upload.single('avatar'), async (req, res) => {
   try {
     console.log(req.file);
-    const queryPost = 'INSERT INTO image_files(filename, filepath, mimetype, size) VALUES($1,$2,$3,$4)';
+    const queryPost = 'INSERT INTO image_files(filename, filepath, mimetype, size) VALUES($1,$2,$3,$4) RETURNING *';
     const valuePost = [`${req.file.filename}`, `${req.file.path}`, `${req.file.mimetype}`, `${req.file.size}`]
-    await db.query(queryPost, valuePost);
-    // const col = await loadCollection(COLLECTION_NAME, db);
-    // const data = col.insert(req.file);
-
-    // db.saveDatabase();
-    res.send({msg: 'add image successfull'});
+    const result = await db.query(queryPost, valuePost);
+    res.status(201).send(
+      {
+        success: true,
+        message: "upload image succesfully",
+        data:{
+          ...result.rows[0]
+        } 
+      }
+    );
   }catch (err){
+    console.log(err);
     res.sendStatus(404);
   }
 });
